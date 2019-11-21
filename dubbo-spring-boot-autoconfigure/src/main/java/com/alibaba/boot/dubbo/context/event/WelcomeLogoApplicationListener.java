@@ -41,12 +41,18 @@ import static com.alibaba.boot.dubbo.util.DubboUtils.LINE_SEPARATOR;
 @Order(LoggingApplicationListener.DEFAULT_ORDER + 1)
 public class WelcomeLogoApplicationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
 
+    /**
+     * 是否执行过
+     *
+     * 通过该变量，保证有且仅处理一次 ApplicationEnvironmentPreparedEvent 事件
+     */
     private static AtomicBoolean processed = new AtomicBoolean(false);
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
 
         // Skip if processed before, prevent duplicated execution in Hierarchical ApplicationContext
+        // 如果已经处理，则直接跳过
         if (processed.get()) {
             return;
         }
@@ -57,6 +63,7 @@ public class WelcomeLogoApplicationListener implements ApplicationListener<Appli
          */
         final Logger logger = LoggerFactory.getLogger(getClass());
 
+        // 获得 Dubbo Banner 文本
         String bannerText = buildBannerText();
 
         if (logger.isInfoEnabled()) {
@@ -66,6 +73,7 @@ public class WelcomeLogoApplicationListener implements ApplicationListener<Appli
         }
 
         // mark processed to be true
+        // 标记已执行
         processed.compareAndSet(false, true);
     }
 

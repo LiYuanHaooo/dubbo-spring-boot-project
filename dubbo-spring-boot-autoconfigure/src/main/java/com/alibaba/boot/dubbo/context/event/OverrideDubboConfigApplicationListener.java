@@ -53,16 +53,17 @@ public class OverrideDubboConfigApplicationListener implements ApplicationListen
          * @see LoggingApplicationListener
          */
         final Logger logger = LoggerFactory.getLogger(getClass());
-
+        // <1> 获得 "dubbo.config.override" 属性对应的值。默认情况下为 true
         ConfigurableEnvironment environment = event.getEnvironment();
 
         boolean override = environment.getProperty(OVERRIDE_CONFIG_PROPERTY_NAME, boolean.class,
                 DEFAULT_OVERRIDE_CONFIG_PROPERTY_VALUE);
 
+        // <2> 如果要重写，则覆盖添加到 Dubbo Properties 中
         if (override) {
-
+            // <2.1> 从 environment 中，提取 "dubbo." 开头的配置
             SortedMap<String, Object> dubboProperties = filterDubboProperties(environment);
-
+            // <2.2> 添加到 Dubbo Properties 中
             ConfigUtils.getProperties().putAll(dubboProperties);
 
             if (logger.isInfoEnabled()) {

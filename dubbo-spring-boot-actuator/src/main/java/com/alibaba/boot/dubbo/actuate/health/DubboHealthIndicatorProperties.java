@@ -34,7 +34,7 @@ import static com.alibaba.boot.dubbo.actuate.health.DubboHealthIndicatorProperti
  * @see HealthIndicator
  * @since 1.0.0
  */
-@ConfigurationProperties(prefix = PREFIX, ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = PREFIX, ignoreUnknownFields = false)// "management.health.dubbo" 开头的配置
 public class DubboHealthIndicatorProperties {
 
     /**

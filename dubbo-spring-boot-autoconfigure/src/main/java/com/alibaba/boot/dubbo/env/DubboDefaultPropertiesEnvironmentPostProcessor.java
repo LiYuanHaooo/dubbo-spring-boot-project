@@ -77,7 +77,9 @@ public class DubboDefaultPropertiesEnvironmentPostProcessor implements Environme
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         MutablePropertySources propertySources = environment.getPropertySources();
+        // <1> 生成 Dubbo 默认配置
         Map<String, Object> defaultProperties = createDefaultProperties(environment);
+        // <2> 有默认配置，则添加到 environment 中
         if (!CollectionUtils.isEmpty(defaultProperties)) {
             addOrReplace(propertySources, defaultProperties);
         }
@@ -90,12 +92,16 @@ public class DubboDefaultPropertiesEnvironmentPostProcessor implements Environme
 
     private Map<String, Object> createDefaultProperties(ConfigurableEnvironment environment) {
         Map<String, Object> defaultProperties = new HashMap<String, Object>();
+        // 直接复用 dubbo.application.name=spring.application.name
         setDubboApplicationNameProperty(environment, defaultProperties);
+        //默认为 true dubbo.config.multiple=true
         setDubboConfigMultipleProperty(defaultProperties);
+        //默认为 false dubbo.config.qos-enable=false
         setDubboApplicationQosEnableProperty(defaultProperties);
         return defaultProperties;
     }
 
+    //dubbo.application.name=spring.application.name
     private void setDubboApplicationNameProperty(Environment environment, Map<String, Object> defaultProperties) {
         String springApplicationName = environment.getProperty(SPRING_APPLICATION_NAME_PROPERTY);
         if (StringUtils.hasLength(springApplicationName)
@@ -104,10 +110,12 @@ public class DubboDefaultPropertiesEnvironmentPostProcessor implements Environme
         }
     }
 
+    //dubbo.config.multiple=true
     private void setDubboConfigMultipleProperty(Map<String, Object> defaultProperties) {
         defaultProperties.put(DUBBO_CONFIG_MULTIPLE_PROPERTY, Boolean.TRUE.toString());
     }
 
+    //false dubbo.config.qos-enable=false
     private void setDubboApplicationQosEnableProperty(Map<String, Object> defaultProperties) {
         defaultProperties.put(DUBBO_APPLICATION_QOS_ENABLE_PROPERTY, Boolean.FALSE.toString());
     }
@@ -120,11 +128,13 @@ public class DubboDefaultPropertiesEnvironmentPostProcessor implements Environme
      */
     private void addOrReplace(MutablePropertySources propertySources,
                               Map<String, Object> map) {
+        // 情况一，获得到 "defaultProperties" 对应的 PropertySource 对象，则进行替换
         MapPropertySource target = null;
         if (propertySources.contains(PROPERTY_SOURCE_NAME)) {
             PropertySource<?> source = propertySources.get(PROPERTY_SOURCE_NAME);
             if (source instanceof MapPropertySource) {
                 target = (MapPropertySource) source;
+                // 遍历 map 数组，进行替换到 "defaultProperties" 中
                 for (String key : map.keySet()) {
                     if (!target.containsProperty(key)) {
                         target.getSource().put(key, map.get(key));
@@ -132,6 +142,7 @@ public class DubboDefaultPropertiesEnvironmentPostProcessor implements Environme
                 }
             }
         }
+        // 情况二，不存在 "defaultProperties" 对应的 PropertySource 对象，则进行添加
         if (target == null) {
             target = new MapPropertySource(PROPERTY_SOURCE_NAME, map);
         }

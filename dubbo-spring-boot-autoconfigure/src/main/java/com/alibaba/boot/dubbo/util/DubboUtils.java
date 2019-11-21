@@ -125,9 +125,9 @@ public abstract class DubboUtils {
         SortedMap<String, Object> dubboProperties = new TreeMap<>();
 
         PropertySourcesPlaceholdersResolver resolver = new PropertySourcesPlaceholdersResolver(environment);
-
+        // 获得所有的配置
         Map<String, Object> properties = EnvironmentUtils.extractProperties(environment);
-
+        // 遍历配置，如果以 "dubbo." 开头，则添加到 dubboProperties 中
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             String propertyName = entry.getKey();
 
