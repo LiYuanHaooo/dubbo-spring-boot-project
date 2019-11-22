@@ -67,19 +67,21 @@ public abstract class AbstractDubboEndpoint implements ApplicationContextAware, 
         }
     }
 
+    //读取 Bean 的基本属性
     protected Map<String, Object> resolveBeanMetadata(final Object bean) {
-
+        // 创建 Map
         final Map<String, Object> beanMetadata = new LinkedHashMap<>();
 
         try {
-
+            // 获得 BeanInfo 对象
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+            // 获得 PropertyDescriptor 数组
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-
+            // 遍历 PropertyDescriptor 数组
             for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-
+                // 获得 Method 对象
                 Method readMethod = propertyDescriptor.getReadMethod();
-
+                // 读取属性，添加到 beanMetadata 中
                 if (readMethod != null && isSimpleType(propertyDescriptor.getPropertyType())) {
 
                     String name = Introspector.decapitalize(propertyDescriptor.getName());
@@ -98,20 +100,23 @@ public abstract class AbstractDubboEndpoint implements ApplicationContextAware, 
 
     }
 
+    //获得所有 ServiceBean
     protected Map<String, ServiceBean> getServiceBeansMap() {
         return beansOfTypeIncludingAncestors(applicationContext, ServiceBean.class);
     }
 
+    //获得 ReferenceAnnotationBeanPostProcessor Bean 对象
     protected ReferenceAnnotationBeanPostProcessor getReferenceAnnotationBeanPostProcessor() {
         return applicationContext.getBean(BEAN_NAME, ReferenceAnnotationBeanPostProcessor.class);
     }
 
+    //获得所有 ProtocolConfig
     protected Map<String, ProtocolConfig> getProtocolConfigsBeanMap() {
         return beansOfTypeIncludingAncestors(applicationContext, ProtocolConfig.class);
     }
 
     private static boolean isSimpleType(Class<?> type) {
-        return isPrimitiveOrWrapper(type)
+        return isPrimitiveOrWrapper(type) // 基本类型 or 包装类型
                 || type == String.class
                 || type == BigDecimal.class
                 || type == BigInteger.class

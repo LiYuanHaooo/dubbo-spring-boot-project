@@ -119,16 +119,21 @@ public class DubboHealthIndicator extends AbstractHealthIndicator {
     /**
      * Resolves the map of {@link StatusChecker}'s name and its' source.
      *
+     * 解析 StatusChecker 的名字的 Map
+     *
+     * KEY：StatusChecker 的名字
+     * VALUE：配置的来源
+     *
      * @return non-null {@link Map}
      */
     protected Map<String, String> resolveStatusCheckerNamesMap() {
-
+        // 创建 Map
         Map<String, String> statusCheckerNamesMap = new LinkedHashMap<>();
-
+        // <1> 从 DubboHealthIndicatorProperties 中获取
         statusCheckerNamesMap.putAll(resolveStatusCheckerNamesMapFromDubboHealthIndicatorProperties());
-
+        // <2> 从 ProtocolConfig 中获取
         statusCheckerNamesMap.putAll(resolveStatusCheckerNamesMapFromProtocolConfigs());
-
+        // <3> 从 ProviderConfig 中获取
         statusCheckerNamesMap.putAll(resolveStatusCheckerNamesMapFromProviderConfig());
 
         return statusCheckerNamesMap;
@@ -136,18 +141,18 @@ public class DubboHealthIndicator extends AbstractHealthIndicator {
     }
 
     private Map<String, String> resolveStatusCheckerNamesMapFromDubboHealthIndicatorProperties() {
-
+        // 获得 DubboHealthIndicatorProperties.Status
         DubboHealthIndicatorProperties.Status status =
                 dubboHealthIndicatorProperties.getStatus();
-
+        // 创建 Map
         Map<String, String> statusCheckerNamesMap = new LinkedHashMap<>();
-
+        // 1. 读取 defaults 属性
         for (String statusName : status.getDefaults()) {
 
             statusCheckerNamesMap.put(statusName, PREFIX + ".status.defaults");
 
         }
-
+        // 2. 读取 extras 属性
         for (String statusName : status.getExtras()) {
 
             statusCheckerNamesMap.put(statusName, PREFIX + ".status.extras");
@@ -160,21 +165,21 @@ public class DubboHealthIndicator extends AbstractHealthIndicator {
 
 
     private Map<String, String> resolveStatusCheckerNamesMapFromProtocolConfigs() {
-
+        // 创建 Map
         Map<String, String> statusCheckerNamesMap = new LinkedHashMap<>();
-
+        // 遍历 protocolConfigs
         for (Map.Entry<String, ProtocolConfig> entry : protocolConfigs.entrySet()) {
-
+            // 获得 Bean 的名字
             String beanName = entry.getKey();
-
+            // 获得 ProtocolConfig 对象
             ProtocolConfig protocolConfig = entry.getValue();
-
+            // 获得 ProtocolConfig 的 StatusChecker 的名字的集合
             Set<String> statusCheckerNames = getStatusCheckerNames(protocolConfig);
-
+            // 遍历 statusCheckerNames 数组
             for (String statusCheckerName : statusCheckerNames) {
-
+                // 构建 source 属性
                 String source = buildSource(beanName, protocolConfig);
-
+                // 添加到 statusCheckerNamesMap 中
                 statusCheckerNamesMap.put(statusCheckerName, source);
 
             }
@@ -186,21 +191,21 @@ public class DubboHealthIndicator extends AbstractHealthIndicator {
     }
 
     private Map<String, String> resolveStatusCheckerNamesMapFromProviderConfig() {
-
+        // 创建 Map
         Map<String, String> statusCheckerNamesMap = new LinkedHashMap<>();
-
+        // 遍历 providerConfigs
         for (Map.Entry<String, ProviderConfig> entry : providerConfigs.entrySet()) {
-
+            // 获得 Bean 的名字
             String beanName = entry.getKey();
-
+            // 获得 ProviderConfig 对象
             ProviderConfig providerConfig = entry.getValue();
-
+            // 获得 ProtocolConfig 的 StatusChecker 的名字的集合
             Set<String> statusCheckerNames = getStatusCheckerNames(providerConfig);
-
+            // 遍历 statusCheckerNames 数组
             for (String statusCheckerName : statusCheckerNames) {
-
+                // 构建 source 属性
                 String source = buildSource(beanName, providerConfig);
-
+                // 添加到 statusCheckerNamesMap 中
                 statusCheckerNamesMap.put(statusCheckerName, source);
 
             }
